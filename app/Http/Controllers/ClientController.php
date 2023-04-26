@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Interfaces\ClientRepositoryInterface;
 use App\Traits\ApiResponser;
-use App\Models\Client;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Response;
@@ -12,18 +12,21 @@ use Illuminate\Http\Request;
 class ClientController extends Controller
 {
     use ApiResponser;
+
+    /** @var ClientRepositoryInterface */
+    private $repository;
+
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct()
-    {
-        //
+    public function __construct(ClientRepositoryInterface $repository) {
+        $this->repository = $repository;     
     }
 
     public function index(){
-        $clients = Client::all();
+        $clients = $this->repository->getAllClients();
 
         return $this->successResponse($clients);
     }
@@ -38,65 +41,57 @@ class ClientController extends Controller
             'name' => 'required|max:255',
             'lastname' => 'required|max:255',
             'age' => 'required|numeric|min:1|max:110',
-            'birthdate' =>'required|date_format:d-m-Y',
+            'birthdate' =>'required|date_format:Y-m-d',
         ];
 
         $this->validate($request, $rules);
 
-        $author = Client::create($request->all());
+        $newClient = $this->repository->createClient($request->all());
 
-        return $this->successResponse($author, Response::HTTP_CREATED);
+        return $this->successResponse($newClient, Response::HTTP_CREATED);
     }
 
     public function getAgeAverage(){
-        $clients= Client::all();
+        $clients = $this->repository->getAllClients();
 
-        $clientsExistError = $this->clientsExistControll($clients);
+        $clientsExistError = $this->clientsExistControl($clients);
         if(!empty($clientsExistError)){
             return $clientsExistError; 
         }      
 
-        $ageAverage = $this->calculateAverage($clients);
+        $ageAverage = $this->repository->calculateAverage($clients);
         
         return $this->successResponse([$ageAverage]);
     }
 
     public function getMeanDeviation(){
-        $clients= Client::all();
+        $clients = $this->repository->getAllClients();
 
-        $clientsExistError = $this->clientsExistControll($clients);
+        $clientsExistError = $this->clientsExistControl($clients);
         if(!empty($clientsExistError)){
             return $clientsExistError; 
         } 
 
-        $meanDeviation= $this->calculateMeanDeviation($clients);
+        $meanDeviation= $this->repository->calculateMeanDeviation($clients);
         
         return $this->successResponse([$meanDeviation]);
     }
 
     public function getListWithProbabilityDeath(){
-        $clients= Client::all();
+        $clients = $this->repository->getAllClients();
 
-        $clientsExistError = $this->clientsExistControll($clients);
+        $clientsExistError = $this->clientsExistControl($clients);
         if(!empty($clientsExistError)){
             return $clientsExistError; 
         } 
 
-        $probabilityOfYearsForLive = $this->calculateAverage($clients) + $this->calculateMeanDeviation($clients);
+        $clientListWithDateOfDeath = $this->repository->generateClientListWithDateOfDeath($clients);
 
-        $clients->map(function ($client) use ($probabilityOfYearsForLive) {
-            $dateOfBirthdate = Carbon::createFromFormat('Y-m-d', $client->birthdate);
-            $probableDateOfDeath = $dateOfBirthdate->addYears($probabilityOfYearsForLive)->format('Y-m-d');
-            $client['probableDateOfDeath'] = $probableDateOfDeath;
-            
-            return $client;   
-        });
-
-        return $this->successResponse($clients);
+        return $this->successResponse($clientListWithDateOfDeath);
     }
 
 
-    private function clientsExistControll(Collection $clients){
+    private function clientsExistControl(Collection $clients){
         $output = [];
         $clientsCount = $clients->count();
         if(!$clientsCount){
@@ -104,23 +99,6 @@ class ClientController extends Controller
         }
 
         return $output;
-    }
-
-    private function calculateAverage(Collection $clients) : float{
-        $ageAverage =  $clients->avg('age');
-        
-        return $ageAverage;
-    } 
-
-    private function calculateMeanDeviation(Collection $clients) : float{
-        $ageAverage = $this->calculateAverage($clients);
-        $clientsCount = $clients->count();
-        $sum =  $clients->sum(function($client) use ($ageAverage){
-            return pow(($client['age'] - $ageAverage), 2);
-        });
-        $meanDeviation= sqrt($sum / $clientsCount);
-
-        return $meanDeviation;
     }
 
 }
