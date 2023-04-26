@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Interfaces\ClientRepositoryInterface;
 use App\Traits\ApiResponser;
+use Illuminate\Support\Facades\Artisan;
+use App\Interfaces\ClientRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
@@ -87,6 +88,16 @@ class ClientController extends Controller
         $clientListWithDateOfDeath = $this->repository->generateClientListWithDateOfDeath($clients);
 
         return $this->successResponse($clientListWithDateOfDeath);
+    }
+
+    public function generateMigration(){
+        try {
+            Artisan::call('migrate:fresh --seed');
+        } catch (\Error $th) {
+            return $this->errorResponse($th, Response::HTTP_INTERNAL_SERVER_ERROR); 
+        }
+
+        return $this->successResponse(["Migration ok"]);
     }
 
 

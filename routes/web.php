@@ -18,3 +18,4 @@ $router->post('/clients', 'ClientController@store');
 $router->get('/clients/age-average', 'ClientController@getAgeAverage');
 $router->get('/clients/mean-deviation', 'ClientController@getMeanDeviation');
 $router->get('/clients/list-with-probability-of-death', 'ClientController@getListWithProbabilityDeath');
+$router->get('/clients/generate-migration', 'ClientController@generateMigration');
