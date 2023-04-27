@@ -6,21 +6,18 @@ use App\Traits\ApiResponser;
 use Illuminate\Support\Facades\Artisan;
 use App\Interfaces\ClientRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
+use App\Interfaces\IClientController;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 
-class ClientController extends Controller
+class ClientController extends Controller implements IClientController
 {
     use ApiResponser;
 
     /** @var ClientRepositoryInterface */
     private $repository;
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
+    
     public function __construct(ClientRepositoryInterface $repository) {
         $this->repository = $repository;     
     }
@@ -31,11 +28,6 @@ class ClientController extends Controller
         return $this->successResponse($clients);
     }
 
-    /**
-     * Create an specific client.
-     *
-     * @return Illuminate\Http\Response
-     */
     public function store(Request $request){
         $rules = [
             'name' => 'required|max:255',

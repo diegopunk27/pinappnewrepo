@@ -1,0 +1,166 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API DOCUMENTATION CLIENTS",
+        "contact": {
+            "email": "diegoyanacon_unse@outlook.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "paths": {
+        "/clients": {
+            "get": {
+                "tags": [
+                    "Clients"
+                ],
+                "summary": "Show a list of clients",
+                "operationId": "0f1432fc97acacf857711ea3d15c69e5",
+                "responses": {
+                    "200": {
+                        "description": "Show list of clients with theirs information"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Clients"
+                ],
+                "summary": "Create a new client",
+                "description": "Create a new client",
+                "operationId": "b6db788d8ee61e3d5dfafa01d0fe1cb5",
+                "requestBody": {
+                    "description": "Client data",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "lastname",
+                                    "age",
+                                    "birthdate"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "format": "string",
+                                        "maxLength": 255,
+                                        "example": "Alberto"
+                                    },
+                                    "lastname": {
+                                        "type": "string",
+                                        "format": "string",
+                                        "maxLength": 255,
+                                        "example": "Perez"
+                                    },
+                                    "age": {
+                                        "type": "integer",
+                                        "example": "37"
+                                    },
+                                    "birthdate": {
+                                        "type": "date",
+                                        "example": "1985-03-01"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Creation success data"
+                    },
+                    "422": {
+                        "description": "Wrong data input",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Sorry, wrond data. Please try again"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/clients/age-average": {
+            "get": {
+                "tags": [
+                    "Clients"
+                ],
+                "summary": "Show years old average of all clients",
+                "operationId": "189fec1701277c7463044b615b6907f5",
+                "responses": {
+                    "200": {
+                        "description": "Show a number that represent the average from years old of all clients"
+                    },
+                    "500": {
+                        "description": "Count of clients is zero"
+                    }
+                }
+            }
+        },
+        "/clients/mean-deviation": {
+            "get": {
+                "tags": [
+                    "Clients"
+                ],
+                "summary": "Show the mean deviation from years old of all clients",
+                "operationId": "1838e7ad193debea9f324ab25d70fd07",
+                "responses": {
+                    "200": {
+                        "description": "Show a number that represent the mean deviation from years old of all clients"
+                    },
+                    "500": {
+                        "description": "Count of clients is zero"
+                    }
+                }
+            }
+        },
+        "/clients/list-with-probability-of-death": {
+            "get": {
+                "tags": [
+                    "Clients"
+                ],
+                "summary": "Show a list of clients with theirs probably date of death",
+                "operationId": "65c597faf5f5a212b2f48a9b384eb5cc",
+                "responses": {
+                    "200": {
+                        "description": "Show a list of clients with theirs probably date of death (calculated from the add between the avergage and mean deviation yaers old)"
+                    },
+                    "500": {
+                        "description": "Count of clients is zero"
+                    }
+                }
+            }
+        },
+        "/clients/generate-migration": {
+            "get": {
+                "tags": [
+                    "Clients"
+                ],
+                "summary": "Generate new fictitious clients in the database",
+                "operationId": "c7aa73513ce3cebadf83db60e8a2b237",
+                "responses": {
+                    "200": {
+                        "description": "Clean the database, and generate fifty new fictitious clients for do testing"
+                    },
+                    "500": {
+                        "description": "Something went wrong"
+                    }
+                }
+            }
+        }
+    }
+}
